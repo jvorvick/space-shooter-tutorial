@@ -1,4 +1,5 @@
 import pygame
+from os.path import join
 
 # general setup
 pygame.init()
@@ -12,6 +13,9 @@ surf = pygame.Surface((100, 200))
 surf.fill('orange')
 x = 100
 
+# importing an image
+player_surf = pygame.image.load(join('images', 'player.png')).convert_alpha()
+
 while running:
     # event loop
     for event in pygame.event.get():
@@ -21,7 +25,7 @@ while running:
     # draw the game
     display_surface.fill('darkgray')
     x += 0.1
-    display_surface.blit(surf, (x, 150))
+    display_surface.blit(player_surf, (x, 150))
     pygame.display.update()
 
 pygame.quit()
