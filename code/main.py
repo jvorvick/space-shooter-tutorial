@@ -51,7 +51,9 @@ while running:
     player_direction = player_direction.normalize() if player_direction else player_direction
     player_rect.center += player_direction * player_speed * dt
 
-    print('fire laser') if pygame.key.get_just_pressed()[pygame.K_SPACE] else None
+    recent_keys = pygame.key.get_just_pressed()
+    if recent_keys[pygame.K_SPACE]:
+        print('fire laser')
 
     # draw the game
     display_surface.fill('darkgray')
