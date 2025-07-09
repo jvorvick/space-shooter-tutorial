@@ -59,14 +59,14 @@ class Meteor(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_frect(center = (randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)))
-        print('create meteor')
-        self.time_since_creation = pygame.time.set_timer()
 
-    def update(self):
-        if self.time_since_creation > 2000:
-            print('kill meteor', self.time_since_creation)
+        self.time_since_creation = pygame.time.get_ticks()
+        self.life_span = 2000
+
+    def update(self, dt):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.time_since_creation >= self.life_span:
             self.kill()
-
 
 # general setup
 pygame.init()
@@ -86,7 +86,7 @@ star_surf = pygame.image.load(join('images', 'star.png')).convert_alpha()
 for i in range(20):
     Star(all_sprites, star_surf)
 meteor_surf = pygame.image.load(join('images', 'meteor.png')).convert_alpha()
-player = Player(all_sprites) 
+player = Player(all_sprites)
 
 laser_surf = pygame.image.load(join('images', 'laser.png')).convert_alpha()
 
@@ -102,6 +102,7 @@ while running:
             running = False
         if event.type == meteor_event:
             Meteor(all_sprites, meteor_surf)
+            
     # update
     all_sprites.update(dt)
 
