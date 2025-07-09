@@ -1,7 +1,7 @@
 import pygame
 from os.path import join
 
-from random import randint
+from random import randint, uniform
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups):
@@ -55,17 +55,18 @@ class Laser(pygame.sprite.Sprite):
             self.kill()
 
 class Meteor(pygame.sprite.Sprite):
-    def __init__(self, groups, surf):
+    def __init__(self, surf, pos, groups):
         super().__init__(groups)
         self.image = surf
-        self.rect = self.image.get_frect(center = (randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)))
-
-        self.time_since_creation = pygame.time.get_ticks()
-        self.life_span = 2000
+        self.rect = self.image.get_frect(center = pos)
+        self.start_time = pygame.time.get_ticks()
+        self.lifetime = 3000
+        self.direction = pygame.Vector2(uniform(-0.5, 0.5), 1)
+        self.speed = randint(400, 500)
 
     def update(self, dt):
-        current_time = pygame.time.get_ticks()
-        if current_time - self.time_since_creation >= self.life_span:
+        self.rect.center += self.direction * self.speed * dt
+        if pygame.time.get_ticks() - self.start_time >= self.lifetime:
             self.kill()
 
 # general setup
@@ -76,19 +77,16 @@ pygame.display.set_caption('Space Shooter')
 running = True
 clock = pygame.time.Clock()
 
-# plain surface
-surf = pygame.Surface((100, 200))
-surf.fill('orange')
-x = 100
-
-all_sprites = pygame.sprite.Group()
+# import
 star_surf = pygame.image.load(join('images', 'star.png')).convert_alpha()
+meteor_surf = pygame.image.load(join('images', 'meteor.png')).convert_alpha()
+laser_surf = pygame.image.load(join('images', 'laser.png')).convert_alpha()
+
+#sprits
+all_sprites = pygame.sprite.Group()
 for i in range(20):
     Star(all_sprites, star_surf)
-meteor_surf = pygame.image.load(join('images', 'meteor.png')).convert_alpha()
 player = Player(all_sprites)
-
-laser_surf = pygame.image.load(join('images', 'laser.png')).convert_alpha()
 
 # custom events -> meteor event
 meteor_event = pygame.event.custom_type()
@@ -101,7 +99,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == meteor_event:
-            Meteor(all_sprites, meteor_surf)
+            x, y = randint(0, WINDOW_WIDTH), randint(-200, -100)
+            Meteor(meteor_surf, (x, y), all_sprites)
             
     # update
     all_sprites.update(dt)
