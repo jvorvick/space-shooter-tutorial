@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         # cooldown
         self.can_shoot = True
         self.laser_shoot_time = 0
-        self.cooldown_duration = 0
+        self.cooldown_duration = 400
 
     def laser_timer(self):
         if not self.can_shoot:
@@ -111,13 +111,13 @@ while running:
     if collision_sprites:
         print(collision_sprites[0])
     
-    pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True)
+    # pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True)
 
-    # if laser_sprites.sprites():
-    #     for laser in laser_sprites:
-    #         meteor_collide = (pygame.sprite.spritecollide(laser, meteor_sprites, True))
-    #         for meteor in meteor_collide:
-    #             pygame.sprite.
+    if laser_sprites.sprites():
+        for laser in laser_sprites:
+            meteor_collide = pygame.sprite.spritecollide(laser, meteor_sprites, True)
+            for meteor in meteor_collide:
+                pygame.sprite.spritecollide(meteor, laser_sprites, True)
     
     # if meteor_sprites.sprites():
     #     for meteor in meteor_sprites:
