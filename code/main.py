@@ -69,6 +69,19 @@ class Meteor(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.start_time >= self.lifetime:
             self.kill()
 
+def collisions():
+    global running
+
+    collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True)
+    if collision_sprites:
+        running = False
+    
+    for laser in laser_sprites:
+        collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
+        if collided_sprites:
+            laser.kill()
+    # pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True
+
 # general setup
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
@@ -82,7 +95,7 @@ star_surf = pygame.image.load(join('images', 'star.png')).convert_alpha()
 meteor_surf = pygame.image.load(join('images', 'meteor.png')).convert_alpha()
 laser_surf = pygame.image.load(join('images', 'laser.png')).convert_alpha()
 
-#sprits
+#sprites
 all_sprites = pygame.sprite.Group()
 meteor_sprites = pygame.sprite.Group()
 laser_sprites = pygame.sprite.Group()
@@ -93,7 +106,7 @@ player = Player(all_sprites)
 
 # custom events -> meteor event
 meteor_event = pygame.event.custom_type()
-pygame.time.set_timer(meteor_event, 50)
+pygame.time.set_timer(meteor_event, 500)
 
 while running:
     dt = clock.tick(60) / 1000
@@ -107,21 +120,13 @@ while running:
             
     # update
     all_sprites.update(dt)
-    collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True)
-    if collision_sprites:
-        print(collision_sprites[0])
-    
-    # pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True)
+    collisions()
 
     if laser_sprites.sprites():
         for laser in laser_sprites:
             meteor_collide = pygame.sprite.spritecollide(laser, meteor_sprites, True)
             for meteor in meteor_collide:
                 pygame.sprite.spritecollide(meteor, laser_sprites, True)
-    
-    # if meteor_sprites.sprites():
-    #     for meteor in meteor_sprites:
-    #         pygame.sprite.spritecollide(meteor, current_laser, True)
 
     # draw the game
     display_surface.fill('darkgray')
