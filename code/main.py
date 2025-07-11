@@ -73,8 +73,8 @@ def collisions():
     global running
 
     collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True)
-    if collision_sprites:
-        running = False
+    # if collision_sprites:
+    #     running = False
     
     for laser in laser_sprites:
         collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
@@ -87,6 +87,10 @@ def display_score():
     text_surf = font.render(str(current_time), True, (240,240,240))
     text_rect = text_surf.get_frect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50))
     display_surface.blit(text_surf, text_rect)
+
+    border_rect = pygame.FRect(0,0,200,150)
+    pygame.draw.rect(display_surface, (240,240,240), border_rect.move_to(center = (text_rect.centerx, text_rect.centery - 6)), 10, 10)
+    
 
 # general setup
 pygame.init()
