@@ -88,9 +88,7 @@ def display_score():
     text_rect = text_surf.get_frect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50))
     display_surface.blit(text_surf, text_rect)
 
-    border_rect = pygame.FRect(0,0,200,150)
-    pygame.draw.rect(display_surface, (240,240,240), border_rect.move_to(center = (text_rect.centerx, text_rect.centery - 6)), 10, 10)
-    
+    pygame.draw.rect(display_surface, (240,240,240), text_rect.inflate(20,10).move(0,-7), 5, 10)
 
 # general setup
 pygame.init()
