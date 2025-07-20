@@ -80,27 +80,42 @@ class Meteor(pygame.sprite.Sprite):
         self.image = pygame.transform.rotozoom(self.original_surf, self.rotation, 1)
         self.rect = self.image.get_frect(center = self.rect.center)
 
-class Explosion(pygame.sprite.Sprite):
-    def __init__(self, surfs, pos, groups, anim_speed):
+class AnimatedExplosion(pygame.sprite.Sprite):
+    def __init__(self, frames, pos, groups):
         super().__init__(groups)
-        self.surfs = surfs
-        self.surf_key = 0
-        self.image = surfs[self.surf_key]
+        self.frames = frames
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
         self.rect = self.image.get_frect(center = pos)
-        self.anim_frame_start = pygame.time.get_ticks()
-        self.last_anim_frame = next(reversed(self.surfs.items()))[0]
-        self.anim_speed = anim_speed
 
     def update(self, dt):
-        self.surf_key = self.anim_speed * round(
-            (pygame.time.get_ticks() - self.anim_frame_start) / self.anim_speed
-        )
-        print(self.surf_key, self.last_anim_frame)
-        if self.surf_key <= self.last_anim_frame:
-            if self.surf_key in self.surfs:
-                self.image = self.surfs[self.surf_key]
+        self.frame_index += 20 * dt
+        if self.frame_index < len(self.frames):
+            self.image = self.frames[int(self.frame_index) % len(self.frames)]
         else:
             self.kill()
+
+
+# class Explosion(pygame.sprite.Sprite):
+#     def __init__(self, surfs, pos, groups, anim_speed):
+#         super().__init__(groups)
+#         self.surfs = surfs
+#         self.surf_key = 0
+#         self.image = surfs[self.surf_key]
+#         self.rect = self.image.get_frect(center = pos)
+#         self.anim_frame_start = pygame.time.get_ticks()
+#         self.last_anim_frame = next(reversed(self.surfs.items()))[0]
+#         self.anim_speed = anim_speed
+
+#     def update(self, dt):
+#         self.surf_key = self.anim_speed * round(
+#             (pygame.time.get_ticks() - self.anim_frame_start) / self.anim_speed
+#         )
+#         if self.surf_key <= self.last_anim_frame:
+#             if self.surf_key in self.surfs:
+#                 self.image = self.surfs[self.surf_key]
+#         else:
+#             self.kill()
 
 def collisions():
     global running
@@ -112,8 +127,12 @@ def collisions():
     for laser in laser_sprites:
         collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
         if collided_sprites:
-            Explosion(explosion_surfs, laser.rect.midtop, (all_sprites, explosion_sprites), explosion_speed)
             laser.kill()
+            AnimatedExplosion(explosion_frames, laser.rect.midtop, all_sprites)
+
+
+            # Explosion(explosion_surfs, laser.rect.midtop, (all_sprites, explosion_sprites), explosion_speed)
+
     # pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True)
 
 def display_score():
@@ -136,27 +155,28 @@ clock = pygame.time.Clock()
 star_surf = pygame.image.load(join('images', 'star.png')).convert_alpha()
 meteor_surf = pygame.image.load(join('images', 'meteor.png')).convert_alpha()
 laser_surf = pygame.image.load(join('images', 'laser.png')).convert_alpha()
-
-explosion_speed = 10
-
-explosion_paths = listdir(join('images', 'explosion'))
-explosion_paths.sort(key=lambda f : int(splitext(f)[0]))
-# explosion_paths.sort(key=lambda f : int(''.join(filter(str.isdigit, f))))
-
-explosion_values = []
-for p in explosion_paths:
-    explosion_values.append(
-        pygame.image.load(join('images', 'explosion', p)).convert_alpha()
-    )
-
-explosion_keys = []
-for i, x in enumerate(explosion_values):
-    explosion_keys.append(i * explosion_speed)
-
-explosion_surfs = dict(zip(explosion_keys, explosion_values))
-print(explosion_surfs)
-
 font = pygame.font.Font(join('images', 'Oxanium-Bold.ttf'), 40)
+explosion_frames = [pygame.image.load(join('images', 'explosion', f'{i}.png')).convert_alpha() for i in range(21)]
+print(explosion_frames)
+
+# explosion_speed = 10
+
+# explosion_paths = listdir(join('images', 'explosion'))
+# explosion_paths.sort(key=lambda f : int(splitext(f)[0]))
+# # explosion_paths.sort(key=lambda f : int(''.join(filter(str.isdigit, f))))
+
+# explosion_values = []
+# for p in explosion_paths:
+#     explosion_values.append(
+#         pygame.image.load(join('images', 'explosion', p)).convert_alpha()
+#     )
+
+# explosion_keys = []
+# for i, x in enumerate(explosion_values):
+#     explosion_keys.append(i * explosion_speed)
+
+# explosion_surfs = dict(zip(explosion_keys, explosion_values))
+
 
 #sprites
 all_sprites = pygame.sprite.Group()
